@@ -19,12 +19,18 @@ with mido.open_input(INPUT) as input_port:
     with mido.open_output(OUTPUT) as output_port:
         for input_message in input_port:
             index = scene_index(input_message)
-            if index:
-                print('received %s on %s scene %s' % (input_message, input_port, index))
-                if index in SCENES:
-                    output_messages = scenes[index]
-                    for output_message in output_messages:
-                        output_port.send(output_message)
-                        print('sent %s on %s scene %s' % (output_message, output_port, index))
-            else:
-                print('ignored %s on %s' % (input_message, input_port))
+
+            if index is None:
+                # print('ignored %s on %s' % (input_message, input_port))
+                continue
+
+            print('received %s on %s scene %s' % (input_message, input_port, index))
+
+            if index not in SCENES:
+                print('not found %s on %s scene %s' % (input_message, input_port, index))
+                continue
+
+            output_messages = SCENES[index]
+            for output_message in output_messages:
+                output_port.send(output_message)
+                print('sent %s on %s scene %s' % (output_message, output_port, index))
